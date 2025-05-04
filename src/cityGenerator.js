@@ -21,10 +21,10 @@ export function cityGenerator() {
   let ground = new THREE.Mesh( groundGeometry, materials["ground"] );
   ground.rotateX(Math.PI/2);
 
-  for(let i = 0; i < 1; i++){
-    for(let j = 0; j < 1; j++){
-      let builds = createBuilds(i*10, j*10);
-      //city.add(builds);
+  for(let i = 0; i < 2; i++){
+    for(let j = 0; j < 2; j++){
+      let builds = createBuilds(i*10-50, j*10-50);
+      city.add(builds);
     }
   }
 
