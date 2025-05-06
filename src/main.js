@@ -31,8 +31,8 @@ function setupThreeJs() {
 
 function buildScene() {
   scene.add(cityGenerator());
-  scene.add(makeLamp())
-  let directionalLight = new THREE.DirectionalLight(0xFFFFFFF, 0.2);
+
+  let directionalLight = new THREE.DirectionalLight(0xFFFFFFF, 1);
   directionalLight.position.set(-1, 2, 3);
   scene.add(directionalLight);
 }
@@ -53,36 +53,3 @@ function animate() {
 setupThreeJs();
 buildScene();
 animate();
-
-
-function makeLamp(){
-
-  const path = new THREE.CurvePath();
-
-	path.add(new THREE.CubicBezierCurve3(
-		new THREE.Vector3(0, 0, 0),
-		new THREE.Vector3(0, 5, 0),
-		new THREE.Vector3(0, 5, 0),
-		new THREE.Vector3(0, 5, 0)
-	  ));
-
-  path.add(new THREE.CubicBezierCurve3(
-      new THREE.Vector3(0, 5, 0),
-      new THREE.Vector3(0, 6, 0),
-      new THREE.Vector3(0, 6, 0),
-      new THREE.Vector3(-3, 6, 0)
-      ));
-	      
-  const tubeGeometry = new THREE.TubeGeometry(path, 200, 0.2, 8, false);
-  const material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
-  const lamp =  new THREE.Mesh(tubeGeometry, material);
-
-  const spotLight = new THREE.SpotLight(0xffDD99, 100);
-  spotLight.position.set(-3, 6, 0);
-  spotLight.target.position.set(0, 0, -10); 
-
-  lamp.add(spotLight);
-  lamp.add(spotLight.target);
-
-  return lamp
-}

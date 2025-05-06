@@ -6,8 +6,8 @@ import { buildRoad } from "./roadGenerator.js";
 
 
 const materials = {
-  "ground": new THREE.MeshBasicMaterial( {color: 0xF38E87, side: THREE.DoubleSide} ),
-  "build": new THREE.MeshBasicMaterial( {color: 0xFFFFFF, side: THREE.DoubleSide} ),
+  "ground": new THREE.MeshPhongMaterial ( {color: 0xF38E87, side: THREE.DoubleSide} ),
+  "build": new THREE.MeshPhongMaterial  ( {color: 0xFFFFFF, side: THREE.DoubleSide} ),
 
 }
 
@@ -24,7 +24,7 @@ export function cityGenerator() {
   for(let i = 0; i < 2; i++){
     for(let j = 0; j < 2; j++){
       let builds = createBuilds(i*10-50, j*10-50);
-      city.add(builds);
+      //city.add(builds);
     }
   }
 

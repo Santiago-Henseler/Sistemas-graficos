@@ -1,7 +1,113 @@
 import * as THREE from "three";
 
+const roadWidth = 5;
+const roadHeight = 0.1;
 
 export function buildRoad(){
+	const path = makePath();
+
+	const shape = new THREE.Shape();
+	shape.moveTo(-roadWidth / 2, -roadHeight / 2);
+	shape.lineTo(roadWidth / 2, -roadHeight / 2);
+	shape.lineTo(roadWidth / 2, roadHeight / 2);
+	shape.lineTo(-roadWidth / 2, roadHeight / 2);
+	shape.lineTo(-roadWidth / 2, -roadHeight / 2);
+
+	const geometry = new THREE.ExtrudeGeometry(shape, {steps: 200,extrudePath: path});
+	const material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
+	const road = new THREE.Mesh(geometry, material);
+
+	addlamps(road, path);
+
+
+	road.add(makeRamp())
+    return road;
+}
+
+function addlamps(road, path){
+	for (let i = 1; i < 4; i++) {
+		const t = i / 4;
+		const point = path.getPointAt(t);
+	  
+		const tangent = path.getTangentAt(t).normalize(); 
+
+		const offset = roadWidth/2 + 0.5;
+		const left1 = point.clone().add(tangent.clone().cross(new THREE.Vector3(0, 1, 0)).normalize().multiplyScalar(offset)).add(tangent.clone().multiplyScalar(3));
+		const right1 = point.clone().add(tangent.clone().cross(new THREE.Vector3(0, -1, 0)).normalize().multiplyScalar(offset));
+	  
+		const leftLamp1 = makeLamp();
+		leftLamp1.lookAt(point);
+		leftLamp1.position.set(left1.x, left1.y, left1.z);
+		road.add(leftLamp1);
+	  
+		const rightLamp1 = makeLamp();
+		rightLamp1.lookAt(point);
+		rightLamp1.rotation.y += Math.PI;
+		rightLamp1.position.set(right1.x, right1.y, right1.z);
+		road.add(rightLamp1);
+
+		const left2 = point.clone().add(tangent.clone().cross(new THREE.Vector3(0, 1, 0)).normalize().multiplyScalar(offset)).add(tangent.clone().multiplyScalar(-3));
+		const right2 = point.clone().add(tangent.clone().cross(new THREE.Vector3(0, -1, 0)).normalize().multiplyScalar(offset)).add(tangent.clone().multiplyScalar(6));
+	  
+		const leftLamp2 = makeLamp();
+		leftLamp2.lookAt(point);
+		leftLamp2.position.set(left2.x, left2.y, left2.z);
+		road.add(leftLamp2);
+	  
+		const rightLamp2 = makeLamp();
+		rightLamp2.lookAt(point);
+		rightLamp2.rotation.y += Math.PI;
+		rightLamp2.position.set(right2.x, right2.y, right2.z);
+		road.add(rightLamp2);
+
+
+	}
+}
+
+function makeRamp(){
+
+	const rampaGeometry = new THREE.BoxGeometry(roadWidth, 0.5, roadWidth);
+	const rampaMaterial = new THREE.MeshStandardMaterial({ color: 0xff5533 });
+	
+	const rampa = new THREE.Mesh(rampaGeometry, rampaMaterial);
+	rampa.rotation.z = -Math.atan(0.5);
+  
+	return rampa
+  }
+
+function makeLamp(){
+
+	const path = new THREE.CurvePath();
+  
+	  path.add(new THREE.CubicBezierCurve3(
+		  new THREE.Vector3(0, 0, 0),
+		  new THREE.Vector3(0, 5, 0),
+		  new THREE.Vector3(0, 5, 0),
+		  new THREE.Vector3(0, 5, 0)
+		));
+  
+	path.add(new THREE.CubicBezierCurve3(
+		new THREE.Vector3(0, 5, 0),
+		new THREE.Vector3(0, 6, 0),
+		new THREE.Vector3(0, 6, 0),
+		new THREE.Vector3(0, 6, 3)
+		));
+			
+	const tubeGeometry = new THREE.TubeGeometry(path, 200, 0.2, 8, false);
+	const material = new THREE.MeshBasicMaterial({ color: 0x424949 });
+	const lamp =  new THREE.Mesh(tubeGeometry, material);
+  
+	const spotLight = new THREE.SpotLight(0xffDD99, 100, 10, Math.PI/2);
+	spotLight.position.set(0, 6, 3);
+	spotLight.target.position.set(0, 0, 0); 
+  
+	lamp.add(spotLight);
+	lamp.add(spotLight.target);
+  
+	return lamp
+}
+
+function makePath(){
 	const path = new THREE.CurvePath();
 
 	path.add(new THREE.CubicBezierCurve3(
@@ -74,22 +180,5 @@ export function buildRoad(){
 		new THREE.Vector3(0, 0, 0) 
 	  ));
 
-
-	const roadWidth = 5;
-	const roadHeight = 0.1;
-
-	const shape = new THREE.Shape();
-	shape.moveTo(-roadWidth / 2, -roadHeight / 2);
-	shape.lineTo(roadWidth / 2, -roadHeight / 2);
-	shape.lineTo(roadWidth / 2, roadHeight / 2);
-	shape.lineTo(-roadWidth / 2, roadHeight / 2);
-	shape.lineTo(-roadWidth / 2, -roadHeight / 2);
-
-	const geometry = new THREE.ExtrudeGeometry(shape, {steps: 200,extrudePath: path});
-	const material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
-    return new THREE.Mesh(geometry, material);
+	return path;
 }
-
-
-
-
