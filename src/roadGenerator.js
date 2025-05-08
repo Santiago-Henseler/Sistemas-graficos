@@ -19,8 +19,38 @@ export function buildRoad(){
 
 	addlamps(road, path);
 
+	const ramp1 = makeRamp();
 
-	road.add(makeRamp())
+	const pointRamp1 = path.getPointAt(0.65);
+	ramp1.position.x = pointRamp1.x;
+	ramp1.position.y = pointRamp1.y;
+	ramp1.position.z = pointRamp1.z;
+
+	ramp1.rotation.y += Math.PI/8;
+
+	road.add(ramp1);
+
+	const ramp2 = makeRamp();
+
+	const pointRamp2 = path.getPointAt(0.15);
+	ramp2.position.x = pointRamp2.x;
+	ramp2.position.y = pointRamp2.y;
+	ramp2.position.z = pointRamp2.z;
+
+	ramp2.rotation.y += Math.PI/2;
+
+	road.add(ramp2);
+
+	const tunel = makeTun();
+
+	const pointTun = path.getPointAt(0.93);
+	tunel.position.x = pointTun.x;
+	tunel.position.y -= 0.5;
+	tunel.position.z = pointTun.z;
+	tunel.rotation.y = Math.PI/2;
+
+	road.add(tunel);
+
     return road;
 }
 
@@ -64,10 +94,33 @@ function addlamps(road, path){
 	}
 }
 
+function makeTun(){
+	const outerRadius = 5;
+	const thickness = 0.3;
+	const depth = 15; 
+
+	const shape = new THREE.Shape();
+	shape.absarc(0, 0, outerRadius, Math.PI, 0, false);
+	shape.lineTo(-outerRadius, 0);
+
+	const hole = new THREE.Path();
+	hole.absarc(0, 0, outerRadius - thickness, Math.PI, 0, false);
+	shape.holes.push(hole);
+
+	const geometry = new THREE.ExtrudeGeometry(shape, {steps: 1,depth: depth, bevelEnabled: false});
+
+	const material = new THREE.MeshPhongMaterial({ color: 0x8888ff });
+	const tunel = new THREE.Mesh(geometry, material);
+
+	tunel.rotation.x = Math.PI;
+
+	return tunel
+}
+
 function makeRamp(){
 
 	const rampaGeometry = new THREE.BoxGeometry(roadWidth, 0.5, roadWidth);
-	const rampaMaterial = new THREE.MeshStandardMaterial({ color: 0xff5533 });
+	const rampaMaterial = new THREE.MeshPhongMaterial({ color: 0xff5533 });
 	
 	const rampa = new THREE.Mesh(rampaGeometry, rampaMaterial);
 	rampa.rotation.z = -Math.atan(0.5);
@@ -94,7 +147,7 @@ function makeLamp(){
 		));
 			
 	const tubeGeometry = new THREE.TubeGeometry(path, 200, 0.2, 8, false);
-	const material = new THREE.MeshBasicMaterial({ color: 0x424949 });
+	const material = new THREE.MeshPhongMaterial({ color: 0x424949 });
 	const lamp =  new THREE.Mesh(tubeGeometry, material);
   
 	const spotLight = new THREE.SpotLight(0xffDD99, 100, 10, Math.PI/2);
