@@ -6,6 +6,8 @@ import * as dat from "dat.gui";
 
 let scene, camera, renderer, container;
 
+let dayTime, sol;
+
 function setupThreeJs() {
   container = document.getElementById("container3D");
 
@@ -30,11 +32,13 @@ function setupThreeJs() {
 }
 
 function buildScene() {
+  dayTime = 0;
   scene.add(cityGenerator());
 
-  let directionalLight = new THREE.DirectionalLight(0xFFFFFFF, 1);
-  directionalLight.position.set(-1, 2, 3);
-  scene.add(directionalLight);
+  sol = new THREE.DirectionalLight(0xFFFFFFF, 1.5);
+  sol.position.set(10, 20, 10);
+  sol.lookAt(0,0,0);
+  scene.add(sol);
 }
 
 function onResize() {
@@ -47,9 +51,20 @@ function onResize() {
 function animate() {
   requestAnimationFrame(animate);
 
+  dayTime += 0.005; 
+  
+  sol.rotation.y += 0.005;
+
+  sol.position.set(
+    Math.sin(dayTime) * 20,
+    20,
+    Math.cos(dayTime) * 20
+  );
+
   renderer.render(scene, camera);
 }
 
 setupThreeJs();
 buildScene();
+
 animate();
