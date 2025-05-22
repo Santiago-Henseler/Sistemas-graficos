@@ -1,5 +1,7 @@
 import * as THREE from "three";
 
+import {materials} from "./textures.js"
+
 const roadWidth = 5;
 const roadHeight = 0.1;
 
@@ -147,8 +149,7 @@ function makeLamp(){
 		));
 			
 	const tubeGeometry = new THREE.TubeGeometry(path, 200, 0.2, 8, false);
-	const material = new THREE.MeshPhongMaterial({ color: 0x424949 });
-	const lamp =  new THREE.Mesh(tubeGeometry, material);
+	const lamp =  new THREE.Mesh(tubeGeometry, materials["light"]);
   
 	const spotLight = new THREE.SpotLight(0xffDD99, 100, 10, Math.PI/2);
 	spotLight.position.set(0, 6, 3);

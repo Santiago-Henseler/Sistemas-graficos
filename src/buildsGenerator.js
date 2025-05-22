@@ -1,12 +1,18 @@
-
+import * as THREE from "three";
 
 export function cilindricBuilding(height, radius, angle1, angle2) {
 	return function (u, v, target) {
 
-		const x = radius * Math.cos(u*2*Math.PI) + angle1 * Math.sin(v*Math.PI*2) + angle2 * Math.sin(u*Math.PI*2);
-		const z = radius * Math.sin(u*2*Math.PI) + angle1 * Math.sin(v*Math.PI*2) + angle2 * Math.sin(u*Math.PI*2);
+		let x = radius * Math.cos(u*2*Math.PI) + angle1 * Math.sin(v*Math.PI*2) + angle2 * Math.sin(u*Math.PI*2);
+		let z = radius * Math.sin(u*2*Math.PI) + angle1 * Math.sin(v*Math.PI*2) + angle2 * Math.sin(u*Math.PI*2);
 		
-		const y = height * v;
+		let y = height * v;
+
+		if (v == 1) {
+			y = height;
+			x = 0;
+			z = 0;
+		}
 		
 		target.set(x, y, z);
 	};
@@ -39,10 +45,32 @@ export function rectangleBuilding(height, width, angle) {
 
 		}
 	
-		const twistedX = Math.cos( v * angle) * x -  Math.sin( v * angle) * z;
-		const twistedZ =  Math.sin( v * angle) * x + Math.cos( v * angle) * z;
+		let twistedX = Math.cos( v * angle) * x -  Math.sin( v * angle) * z;
+		let twistedZ =  Math.sin( v * angle) * x + Math.cos( v * angle) * z;
+		
+		if( v == 1){
+			twistedX = 0;
+			twistedZ = 0;
+			y = height;
+		}
 
 		target.set(twistedX, y, twistedZ);
 	};
 }
 
+export function ovalBuild(height, radius1, radius2, tope) {
+    return function (u, v, target) {
+		let x = (radius1 * Math.cos(u*2*Math.PI))*(1+tope-v);
+		let z = (radius2 * Math.sin(u*2*Math.PI))*(1+tope-v);
+		
+		let y = height * v;
+
+		if (v == 1) {
+			y = height;
+			x = 0;
+			z = 0;
+		}
+		
+		target.set(x, y, z);
+    }
+}

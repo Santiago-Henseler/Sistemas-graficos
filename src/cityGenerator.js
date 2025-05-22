@@ -1,15 +1,10 @@
 import * as THREE from "three";
 import { ParametricGeometry } from 'three/addons/geometries/ParametricGeometry.js';
 
-import { cilindricBuilding , rectangleBuilding } from "./buildsGenerator.js";
+import { cilindricBuilding , rectangleBuilding,  ovalBuild } from "./buildsGenerator.js";
 import { buildRoad } from "./roadGenerator.js";
 import { getRandomFloat, getRandomInt } from "./utils.js"
-
-
-const materials = {
-  "ground": new THREE.MeshPhongMaterial ( {color: 0xF38E87, side: THREE.DoubleSide} ),
-  "build": new THREE.MeshPhongMaterial  ( {color: 0xFFFFFF, side: THREE.DoubleSide} ),
-}
+import {materials} from "./textures.js";
 
 export function cityGenerator() {
   let city = new THREE.Group();
@@ -29,7 +24,7 @@ export function cityGenerator() {
                 5: [2,4,5,6,9],
                 6: [2,4,5,6,9],
                 7: [2,4,5,6,9,10],
-                8: [3,4,5,6,9],
+                8: [2,3,4,5,6,9,10],
                 9: [6,7,8],
                 10: [],
   }
@@ -49,6 +44,7 @@ export function cityGenerator() {
 
   city.add(buildRoad());
 
+
   return city;
 }
 
@@ -57,20 +53,29 @@ function createBuilds(x, z){
   let neighborhood = new THREE.Group(); 
 
   let geometry = new ParametricGeometry(getParametricFunction(), 100, 100);
-	let mesh = new THREE.Mesh(geometry, materials["build"]);
 
-  mesh.position.set(x+ getRandomFloat(2, 6), 0, z+getRandomFloat(2, 6));
+  const mat = () => {
+    switch (getRandomInt(1,3)){
+      case 1: return materials["build1"];
+      case 2: return materials["build2"];
+      case 3: return materials["build3"];
+    }
+  }
+
+	let mesh = new THREE.Mesh(geometry, mat());
+
+  mesh.position.set(x+ getRandomFloat(2,8), 0, z+getRandomFloat(2, 8));
   neighborhood.add(mesh);
   
   return neighborhood;
 }
 
 function getParametricFunction(){
-  const fn = getRandomInt(1,2);
-
+  const fn = getRandomInt(1,3);
   switch (fn){
     case 1: return cilindricBuilding( getRandomFloat(9, 15),  getRandomFloat(1, 2), getRandomFloat(0, 1), getRandomFloat(0, 1));
     case 2: return rectangleBuilding( getRandomFloat(9, 15), getRandomFloat(2, 3), getRandomFloat(Math.PI, Math.PI*2));
+    case 3: return ovalBuild(getRandomFloat(9, 15), getRandomFloat(0.5,1.5),  getRandomFloat(0.5,1.5),  getRandomInt(0.5,1), getRandomInt(0.5, 1));
   }
    
 }

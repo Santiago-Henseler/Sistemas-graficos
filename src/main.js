@@ -1,11 +1,15 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-
-import { cityGenerator } from "./cityGenerator.js";
+import Stats from 'three/addons/libs/stats.module.js';
 import * as dat from "dat.gui";
 
-let scene, camera, renderer, container;
+import { PhysicsSimulator } from './PhysicsSimulator.js';
+import { cityGenerator } from "./cityGenerator.js";
+import {Car} from "./carGenerator.js";
 
+let scene, camera, renderer, container;
+let physicsSimulator;
+let car;
 let dayTime, sol;
 
 function setupThreeJs() {
@@ -34,11 +38,22 @@ function setupThreeJs() {
 function buildScene() {
   dayTime = 0;
   scene.add(cityGenerator());
+  car = new Car();
+  scene.add(car.getCar());
 
-  sol = new THREE.DirectionalLight(0xFFFFFFF, 1.5);
-  sol.position.set(10, 20, 10);
+  sol = new THREE.DirectionalLight(0xFFFFFFF, 2);
+
+  let helper = new  THREE.DirectionalLightHelper(sol, 10);
+
+  sol.position.set(0, 40, 0);
   sol.lookAt(0,0,0);
-  scene.add(sol);
+
+  scene.add(new THREE.AmbientLight(0xFFFFFF, 1.5));
+}
+
+async function initPhysics() {
+  physicsSimulator = new PhysicsSimulator();
+  await physicsSimulator.initSimulation();
 }
 
 function onResize() {
@@ -50,21 +65,16 @@ function onResize() {
 
 function animate() {
   requestAnimationFrame(animate);
+  physicsSimulator.update();
+  car.updateVehicleTransforms(physicsSimulator);
 
   dayTime += 0.005; 
-  
-  sol.rotation.y += 0.005;
-
-  sol.position.set(
-    Math.sin(dayTime) * 20,
-    20,
-    Math.cos(dayTime) * 20
-  );
 
   renderer.render(scene, camera);
 }
 
 setupThreeJs();
 buildScene();
+initPhysics();
 
 animate();
