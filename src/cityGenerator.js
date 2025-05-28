@@ -9,12 +9,11 @@ import {materials} from "./textures.js";
 export function cityGenerator() {
   let city = new THREE.Group();
 
-  const gridHelper = new THREE.GridHelper(100, 10);
-  city.add(gridHelper);
-
-  const groundGeometry = new THREE.PlaneGeometry( 100, 100 );
+  const groundGeometry = new THREE.PlaneGeometry( 120, 120 );
   let ground = new THREE.Mesh( groundGeometry, materials["ground"] );
+
   ground.rotateX(Math.PI/2);
+  ground.receiveShadow = true;
 
   const notPos = {
                 1: [],
@@ -51,8 +50,10 @@ export function cityGenerator() {
 function createBuilds(x, z){
 
   let neighborhood = new THREE.Group(); 
+  
+  let {fn, tapa} = getParametricFunction();
 
-  let geometry = new ParametricGeometry(getParametricFunction(), 100, 100);
+  let geometry = new ParametricGeometry(fn, 100, 100);
 
   const mat = () => {
     switch (getRandomInt(1,3)){
@@ -62,20 +63,75 @@ function createBuilds(x, z){
     }
   }
 
-	let mesh = new THREE.Mesh(geometry, mat());
+	let meshWall = new THREE.Mesh(geometry, mat());
 
-  mesh.position.set(x+ getRandomFloat(2,8), 0, z+getRandomFloat(2, 8));
-  neighborhood.add(mesh);
+  meshWall.position.set(x+ getRandomFloat(2,8), 0, z+getRandomFloat(2, 8));
+  
+  meshWall.add(tapa)
+  meshWall.castShadow = true;
+  meshWall.receiveShadow = true;
+
+  neighborhood.add(meshWall);
   
   return neighborhood;
 }
 
 function getParametricFunction(){
-  const fn = getRandomInt(1,3);
-  switch (fn){
-    case 1: return cilindricBuilding( getRandomFloat(9, 15),  getRandomFloat(1, 2), getRandomFloat(0, 1), getRandomFloat(0, 1));
-    case 2: return rectangleBuilding( getRandomFloat(9, 15), getRandomFloat(2, 3), getRandomFloat(Math.PI, Math.PI*2));
-    case 3: return ovalBuild(getRandomFloat(9, 15), getRandomFloat(0.5,1.5),  getRandomFloat(0.5,1.5),  getRandomInt(0.5,1), getRandomInt(0.5, 1));
+
+  const height = getRandomFloat(15, 25);
+  const radiusC = getRandomFloat(1, 2);
+  const angle1C = getRandomFloat(0, 1);
+  const angle2C = getRandomFloat(0, 1);
+
+  const width = getRandomFloat(2, 3);
+  const angleR = getRandomFloat(Math.PI, Math.PI*2);
+
+  const radius1 = getRandomFloat(0.5,1.5);
+  const radius2 = getRandomFloat(0.5,1.5);
+  const tope = getRandomInt(0.5,1);
+
+  const type = getRandomInt(1,3);
+  switch (type){
+    case 1: let geometriaCilindro = new THREE.CircleGeometry(radiusC || 1, 32);
+            const tapaC = new THREE.Mesh(createCapFromParametric(cilindricBuilding( height,  radiusC, angle1C, angle2C)), materials["light"]);
+            tapaC.position.set(0, height,0);
+            tapaC.rotation.x = Math.PI / 2;
+            return { 
+                    fn: cilindricBuilding( height,  radiusC, angle1C, angle2C),
+                    tapa: tapaC
+                  };
+    case 2: let geometriaPlano = new THREE.PlaneGeometry(width || 2, width || 2);
+            const tapaR = new THREE.Mesh(geometriaPlano, materials["light"]);
+            tapaR.rotation.x = Math.PI / 2;
+            tapaR.rotation.z = angleR;
+            tapaR.position.set(0, height,0);
+            return {
+                  fn: rectangleBuilding( height, width, angleR),
+                  tapa: tapaR
+                };
+    case 3: const tapaO = new THREE.Mesh(createCapFromParametric(cilindricBuilding( height,  radiusC, angle1C, angle2C)), materials["light"]);
+            tapaO.position.set(0, height,0);
+            tapaO.rotation.x = Math.PI / 2;
+            tapaO.scale.set(1/radiusC, 1/radiusC)
+            return {
+                    fn: ovalBuild(height, radius1,  radius2, tope),
+                    tapa:  tapaO
+                  };
   }
-   
+}
+
+function createCapFromParametric(fn, segmentsU = 50) {
+  const points = [];
+
+  for (let i = 0; i <= segmentsU; i++) {
+    const u = i / segmentsU;
+    const target = new THREE.Vector3();
+    fn(u, 1, target);
+    points.push(new THREE.Vector2(target.x, target.z));
+  }
+
+  const shape = new THREE.Shape(points);
+  const geometry = new THREE.ShapeGeometry(shape);
+
+  return geometry;
 }

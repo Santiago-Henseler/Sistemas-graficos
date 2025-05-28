@@ -8,12 +8,6 @@ export function cilindricBuilding(height, radius, angle1, angle2) {
 		
 		let y = height * v;
 
-		if (v == 1) {
-			y = height;
-			x = 0;
-			z = 0;
-		}
-		
 		target.set(x, y, z);
 	};
 }
@@ -47,12 +41,6 @@ export function rectangleBuilding(height, width, angle) {
 	
 		let twistedX = Math.cos( v * angle) * x -  Math.sin( v * angle) * z;
 		let twistedZ =  Math.sin( v * angle) * x + Math.cos( v * angle) * z;
-		
-		if( v == 1){
-			twistedX = 0;
-			twistedZ = 0;
-			y = height;
-		}
 
 		target.set(twistedX, y, twistedZ);
 	};
@@ -65,12 +53,6 @@ export function ovalBuild(height, radius1, radius2, tope) {
 		
 		let y = height * v;
 
-		if (v == 1) {
-			y = height;
-			x = 0;
-			z = 0;
-		}
-		
 		target.set(x, y, z);
     }
 }
