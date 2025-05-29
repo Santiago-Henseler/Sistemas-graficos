@@ -6,11 +6,11 @@ import { buildRoad } from "./roadGenerator.js";
 import { getRandomFloat, getRandomInt } from "./utils.js"
 import {materials} from "./textures.js";
 
-export function cityGenerator() {
+export function cityGenerator(physicsSimulator) {
   let city = new THREE.Group();
 
   const groundGeometry = new THREE.PlaneGeometry( 120, 120 );
-  let ground = new THREE.Mesh( groundGeometry, materials["ground"] );
+  let ground = new THREE.Mesh( groundGeometry, materials["ground"]);
 
   ground.rotateX(Math.PI/2);
   ground.receiveShadow = true;
@@ -25,7 +25,7 @@ export function cityGenerator() {
                 7: [2,4,5,6,9,10],
                 8: [2,3,4,5,6,9,10],
                 9: [6,7,8],
-                10: [],
+               10: [],
   }
 
   for (let i = 1; i <= 10; i++) {
@@ -34,20 +34,25 @@ export function cityGenerator() {
         continue;
       }
 
-      let builds = createBuilds((i-1) * 10 - 50, (j-1) * 10 - 50);
+      let builds = createBuilds((i-1) * 10 - 50, (j-1) * 10 - 50, physicsSimulator);
       city.add(builds);
     }
   }
 
   city.add(ground);
 
-  city.add(buildRoad());
+  let {road, rigidBodys} = buildRoad();
 
+  city.add(road);
+
+  rigidBodys.forEach((rg)=>{
+    physicsSimulator.addRigidBody(rg,0,0);
+  })
 
   return city;
 }
 
-function createBuilds(x, z){
+function createBuilds(x, z, physicsSimulator){
 
   let neighborhood = new THREE.Group(); 
   
@@ -65,8 +70,19 @@ function createBuilds(x, z){
 
 	let meshWall = new THREE.Mesh(geometry, mat());
 
-  meshWall.position.set(x+ getRandomFloat(2,8), 0, z+getRandomFloat(2, 8));
-  
+  let xpos = x + getRandomFloat(2,8);
+  let zpos = z + getRandomFloat(2, 8);
+
+  const rigidBody = new THREE.CylinderGeometry(2.5, 2.5, 5, 16);
+  const column = new THREE.Mesh(rigidBody, new THREE.MeshPhongMaterial({transparent:true, opacity: 0} ));
+  column.position.set(xpos, 2.5, zpos);
+
+  physicsSimulator.addRigidBody(column, 0, 0);
+
+  neighborhood.add(column)
+
+  meshWall.position.set(xpos, 0, zpos);
+
   meshWall.add(tapa)
   meshWall.castShadow = true;
   meshWall.receiveShadow = true;

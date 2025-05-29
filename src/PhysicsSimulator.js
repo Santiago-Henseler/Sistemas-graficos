@@ -55,7 +55,7 @@ export class PhysicsSimulator {
     constructor(vehicleParams={},groundParams={}) {
         this.params.vehicle = Object.assign(defaultVehicleParams, vehicleParams);
         this.params.ground = Object.assign(defaultGroundParams, groundParams);        
-
+        
         const wheelSeparation = this.params.vehicle.wheelSeparation;
         const axesSeparation = this.params.vehicle.axesSeparation;
 

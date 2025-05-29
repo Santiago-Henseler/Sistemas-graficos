@@ -35,9 +35,10 @@ function setupThreeJs() {
   window.addEventListener("resize", onResize);
   onResize();
 }
-let sunlightHelper;
+
 function buildScene() {
-  scene.add(cityGenerator());
+  // objects
+  scene.add(cityGenerator(physicsSimulator));
   car = new Car();
   scene.add(car.getCar());
 
@@ -53,9 +54,6 @@ function buildScene() {
   sol.shadow.mapSize.height = 2048;
 
   scene.add(sol);
-
-  sunlightHelper = new THREE.DirectionalLightHelper(sol, 10, 0xffff00); // tamaño, color opcional
-  scene.add(sunlightHelper);
   
   sky = new Sky();
   sky.scale.setScalar( 450000 );
@@ -85,7 +83,6 @@ function animate() {
   physicsSimulator.update();
   car.updateVehicleTransforms(physicsSimulator);
 
-  sunlightHelper.update();
 
   // luces
   sol.position.set(
@@ -106,8 +103,15 @@ function animate() {
 }
 
 setupThreeJs();
+await initPhysics();
 buildScene();
-initPhysics();
 
 animate();
 
+
+document.addEventListener('keydown', (event) => {
+  switch (event.key) {
+    case 'r':
+      physicsSimulator.resetVehicle()
+  }
+});

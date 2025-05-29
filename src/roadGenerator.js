@@ -6,6 +6,8 @@ const roadWidth = 5;
 const roadHeight = 0.1;
 
 export function buildRoad(){
+	let rigidBodys = [];
+
 	const path = makePath();
 
 	const shape = new THREE.Shape();
@@ -15,11 +17,21 @@ export function buildRoad(){
 	shape.lineTo(-roadWidth / 2, roadHeight / 2);
 	shape.lineTo(-roadWidth / 2, -roadHeight / 2);
 
-	const geometry = new THREE.ExtrudeGeometry(shape, {steps: 200,extrudePath: path});
-	const material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
-	const road = new THREE.Mesh(geometry, material);
+	const geometry = new THREE.ExtrudeGeometry(shape, {steps: 500,extrudePath: path});
+	const road = new THREE.Mesh(geometry, materials["road"]);
 
-	addlamps(road, path);
+	let lamps = getLamps(path);
+
+	lamps.forEach((lamp)=>{
+		road.add(lamp);
+
+		const rigidBody = new THREE.CylinderGeometry(0.5, 0.5, 2, 16);
+		const column = new THREE.Mesh(rigidBody, new THREE.MeshPhongMaterial({transparent:true, opacity: 0} ));
+		column.position.set(lamp.position.x, 0.5, lamp.position.z);
+
+		road.add(column)
+		rigidBodys.push(column);
+	})
 
 	const ramp1 = makeRamp();
 
@@ -31,6 +43,7 @@ export function buildRoad(){
 	ramp1.rotation.y += Math.PI/8;
 
 	road.add(ramp1);
+	rigidBodys.push(ramp1);
 
 	const ramp2 = makeRamp();
 
@@ -42,21 +55,26 @@ export function buildRoad(){
 	ramp2.rotation.y += Math.PI/2;
 
 	road.add(ramp2);
+	rigidBodys.push(ramp2);
 
 	const tunel = makeTun();
 
 	const pointTun = path.getPointAt(0.93);
-	tunel.position.x = pointTun.x;
-	tunel.position.y -= 0.5;
+	tunel.position.x = pointTun.x+10;
 	tunel.position.z = pointTun.z;
-	tunel.rotation.y = Math.PI/2;
-
+	
 	road.add(tunel);
-
-    return road;
+	
+    return {
+			road: road,
+			rigidBodys: rigidBodys
+			};
 }
 
-function addlamps(road, path){
+function getLamps(path){
+
+	let lamps =  [];
+
 	for (let i = 1; i < 4; i++) {
 		const t = i / 4;
 		const point = path.getPointAt(t);
@@ -70,13 +88,13 @@ function addlamps(road, path){
 		const leftLamp1 = makeLamp();
 		leftLamp1.lookAt(point);
 		leftLamp1.position.set(left1.x, left1.y, left1.z);
-		road.add(leftLamp1);
+		lamps.push(leftLamp1);
 	  
 		const rightLamp1 = makeLamp();
 		rightLamp1.lookAt(point);
 		rightLamp1.rotation.y += Math.PI;
 		rightLamp1.position.set(right1.x, right1.y, right1.z);
-		road.add(rightLamp1);
+		lamps.push(rightLamp1);
 
 		const left2 = point.clone().add(tangent.clone().cross(new THREE.Vector3(0, 1, 0)).normalize().multiplyScalar(offset)).add(tangent.clone().multiplyScalar(-3));
 		const right2 = point.clone().add(tangent.clone().cross(new THREE.Vector3(0, -1, 0)).normalize().multiplyScalar(offset)).add(tangent.clone().multiplyScalar(6));
@@ -84,37 +102,24 @@ function addlamps(road, path){
 		const leftLamp2 = makeLamp();
 		leftLamp2.lookAt(point);
 		leftLamp2.position.set(left2.x, left2.y, left2.z);
-		road.add(leftLamp2);
+		lamps.push(leftLamp2);
 	  
 		const rightLamp2 = makeLamp();
 		rightLamp2.lookAt(point);
 		rightLamp2.rotation.y += Math.PI;
 		rightLamp2.position.set(right2.x, right2.y, right2.z);
-		road.add(rightLamp2);
-
-
+		lamps.push(rightLamp2);
 	}
+	return lamps;
 }
 
 function makeTun(){
-	const outerRadius = 5;
-	const thickness = 0.3;
-	const depth = 15; 
+	const geometry = new THREE.CylinderGeometry(5, 5, 15, 200, 200,true, 0, Math.PI);
 
-	const shape = new THREE.Shape();
-	shape.absarc(0, 0, outerRadius, Math.PI, 0, false);
-	shape.lineTo(-outerRadius, 0);
+	const tunel = new THREE.Mesh(geometry, materials["tunel"]);
 
-	const hole = new THREE.Path();
-	hole.absarc(0, 0, outerRadius - thickness, Math.PI, 0, false);
-	shape.holes.push(hole);
-
-	const geometry = new THREE.ExtrudeGeometry(shape, {steps: 1,depth: depth, bevelEnabled: false});
-
-	const material = new THREE.MeshPhongMaterial({ color: 0x8888ff });
-	const tunel = new THREE.Mesh(geometry, material);
-
-	tunel.rotation.x = Math.PI;
+	tunel.rotation.x = Math.PI*2;
+	tunel.rotation.z = Math.PI/2;
 
 	return tunel
 }
