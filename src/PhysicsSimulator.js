@@ -5,15 +5,15 @@ import { min, step } from 'three/tsl';
 
 export const defaultVehicleParams = {
     wheelSeparation: 2.5, // distance between the wheels
-    axesSeparation: 3, // distance between the front and rear wheels
+    axesSeparation: 4, // distance between the front and rear wheels
     wheelRadius: 0.6,
     wheelWidth: 0.4,
     suspensionRestLength: 0.8,
-    initialPosition:new THREE.Vector3(0,2,0), // initial position of the vehicle
+    initialPosition:new THREE.Vector3(0,0.5,0), // initial position of the vehicle
     initialYRotation:0, // angle in radians
     steeringReaction:0.1, // how fast the steering reacts to input
     maxSteeringAngle: Math.PI / 16, // maximum steering angle in radians
-    mass:10,
+    mass:15,
     accelerateForce:{
         min:-15,
         max:40,

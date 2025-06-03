@@ -45,6 +45,17 @@ export function cityGenerator(physicsSimulator) {
 
   city.add(road);
 
+  const tunelGeometry = new THREE.BoxGeometry(14.8, 0.5, 4);
+	const tunel1 = new THREE.Mesh(tunelGeometry, materials["tunel"]);
+  tunel1.rotation.x = Math.PI/2;
+  tunel1.position.set(10, 1,-5);
+
+  const tunel2 = new THREE.Mesh(tunelGeometry, materials["tunel"]);
+  tunel2.rotation.x = Math.PI/2;
+  tunel2.position.set(10, 1, -15);
+
+  physicsSimulator.addRigidBody(tunel2,0,0)
+  physicsSimulator.addRigidBody(tunel1,0,0);
   rigidBodys.forEach((rg)=>{
     physicsSimulator.addRigidBody(rg,0,0);
   })
@@ -108,8 +119,7 @@ function getParametricFunction(){
 
   const type = getRandomInt(1,3);
   switch (type){
-    case 1: let geometriaCilindro = new THREE.CircleGeometry(radiusC || 1, 32);
-            const tapaC = new THREE.Mesh(createCapFromParametric(cilindricBuilding( height,  radiusC, angle1C, angle2C)), materials["light"]);
+    case 1: const tapaC = new THREE.Mesh(createCapFromParametric(cilindricBuilding( height,  radiusC, angle1C, angle2C)), materials["road"]);
             tapaC.position.set(0, height,0);
             tapaC.rotation.x = Math.PI / 2;
             return { 
@@ -117,7 +127,7 @@ function getParametricFunction(){
                     tapa: tapaC
                   };
     case 2: let geometriaPlano = new THREE.PlaneGeometry(width || 2, width || 2);
-            const tapaR = new THREE.Mesh(geometriaPlano, materials["light"]);
+            const tapaR = new THREE.Mesh(geometriaPlano, materials["techo"]);
             tapaR.rotation.x = Math.PI / 2;
             tapaR.rotation.z = angleR;
             tapaR.position.set(0, height,0);
@@ -125,10 +135,9 @@ function getParametricFunction(){
                   fn: rectangleBuilding( height, width, angleR),
                   tapa: tapaR
                 };
-    case 3: const tapaO = new THREE.Mesh(createCapFromParametric(cilindricBuilding( height,  radiusC, angle1C, angle2C)), materials["light"]);
-            tapaO.position.set(0, height,0);
+    case 3: const tapaO = new THREE.Mesh(createCapFromParametric(ovalBuild(height, radius1,  radius2, tope)), materials["road"]);
+            tapaO.position.set(0, height, 0);
             tapaO.rotation.x = Math.PI / 2;
-            tapaO.scale.set(1/radiusC, 1/radiusC)
             return {
                     fn: ovalBuild(height, radius1,  radius2, tope),
                     tapa:  tapaO

@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { ParametricGeometry } from 'three/addons/geometries/ParametricGeometry.js';
 
 import {materials} from "./textures.js"
 
@@ -10,22 +11,31 @@ export function buildRoad(){
 
 	const path = makePath();
 
-	const shape = new THREE.Shape();
-	shape.moveTo(-roadWidth / 2, -roadHeight / 2);
-	shape.lineTo(roadWidth / 2, -roadHeight / 2);
-	shape.lineTo(roadWidth / 2, roadHeight / 2);
-	shape.lineTo(-roadWidth / 2, roadHeight / 2);
-	shape.lineTo(-roadWidth / 2, -roadHeight / 2);
+	const width = 5;
+	const lengthSegments = 400;
+	const widthSegments = 5;
 
-	const geometry = new THREE.ExtrudeGeometry(shape, {steps: 500,extrudePath: path});
+	const paramFunc = (u, v, target) => {
+		const point = path.getPointAt(u);
+		const tangent = path.getTangentAt(u).normalize();
+		const up = new THREE.Vector3(0, 1, 0);
+		const side = new THREE.Vector3().crossVectors(up, tangent).normalize();
+	  
+		const offset = side.multiplyScalar((v - 0.5) * width);
+		target.copy(point).add(offset);
+	};
+
+	const geometry = new ParametricGeometry(paramFunc, lengthSegments, widthSegments);
 	const road = new THREE.Mesh(geometry, materials["road"]);
+
+	road.position.y = 0.1;
 
 	let lamps = getLamps(path);
 
 	lamps.forEach((lamp)=>{
 		road.add(lamp);
 
-		const rigidBody = new THREE.CylinderGeometry(0.5, 0.5, 2, 16);
+		const rigidBody = new THREE.CylinderGeometry(0.5, 0.5, 5, 16);
 		const column = new THREE.Mesh(rigidBody, new THREE.MeshPhongMaterial({transparent:true, opacity: 0} ));
 		column.position.set(lamp.position.x, 0.5, lamp.position.z);
 
@@ -127,9 +137,8 @@ function makeTun(){
 function makeRamp(){
 
 	const rampaGeometry = new THREE.BoxGeometry(roadWidth, 0.5, roadWidth);
-	const rampaMaterial = new THREE.MeshPhongMaterial({ color: 0xff5533 });
 	
-	const rampa = new THREE.Mesh(rampaGeometry, rampaMaterial);
+	const rampa = new THREE.Mesh(rampaGeometry, materials["tunel"]);
 	rampa.rotation.z = -Math.atan(0.5);
   
 	return rampa

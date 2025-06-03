@@ -1,36 +1,42 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { Sky } from 'three/addons/objects/Sky.js';
-import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+import * as dat from 'dat.gui';
 
 import { PhysicsSimulator } from './PhysicsSimulator.js';
 import { cityGenerator } from "./cityGenerator.js";
 import {Car} from "./carGenerator.js";
-import {materials} from "./textures.js";
+
+const params = {
+  cameras: 'orbital',
+};
 
 let scene, camera, renderer, container;
 let physicsSimulator;
 let car;
-let sky,sol;
+let sky, sol;
+
+let cameraVehiculo1;
+let cameraVehiculo2;
+const cameraOrbital = new THREE.PerspectiveCamera(
+  75,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+cameraOrbital.position.set(80, 50, 60);
+cameraOrbital.lookAt(0, 0, 0);
 
 function setupThreeJs() {
   container = document.getElementById("container3D");
 
-  renderer = new THREE.WebGLRenderer();
+  renderer = new THREE.WebGLRenderer({ antialias: true });
   scene = new THREE.Scene();
 
   container.appendChild(renderer.domElement);
 
-  camera = new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    1000
-  );
-  camera.position.set(80, 50, 60);
-  camera.lookAt(0, 0, 0);
-
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = new OrbitControls(cameraOrbital, renderer.domElement);
+  camera = cameraOrbital;
 
   window.addEventListener("resize", onResize);
   onResize();
@@ -39,8 +45,7 @@ function setupThreeJs() {
 function buildScene() {
   // objects
   scene.add(cityGenerator(physicsSimulator));
-  car = new Car();
-  scene.add(car.getCar());
+  car = new Car(scene);
 
   // luces 
   scene.add(new THREE.AmbientLight(0xFFFFFF, 0.3));
@@ -83,7 +88,6 @@ function animate() {
   physicsSimulator.update();
   car.updateVehicleTransforms(physicsSimulator);
 
-
   // luces
   sol.position.set(
     70 * Math.cos(time+0.1),
@@ -98,14 +102,33 @@ function animate() {
   uniforms[ 'mieDirectionalG' ].value = 0;
   uniforms[ 'sunPosition' ].value.copy(new THREE.Vector3(1,4,-180));
 
-
   renderer.render(scene, camera);
+}
+
+function createUI() {
+	const gui = new dat.GUI();
+
+	gui.add(params, 'cameras', ['vehiculo1', 'vehiculo2','orbital', 'peaton']).onChange((value) => {
+    switch (value){
+      case 'orbital':
+        camera = cameraOrbital;
+        break;
+      case 'vehiculo1':
+        camera = car.getCam1();
+        break;
+      case 'vehiculo2':
+        camera = car.getCam2();
+        break;
+      case 'peaton':
+        break;
+    }
+	});
 }
 
 setupThreeJs();
 await initPhysics();
 buildScene();
-
+createUI();
 animate();
 
 
