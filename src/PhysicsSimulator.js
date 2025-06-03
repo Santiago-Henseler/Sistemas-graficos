@@ -199,18 +199,18 @@ export class PhysicsSimulator {
 
     setupEventListeners() {
         window.addEventListener('keydown', (event) => {
-            if (event.key === 'w' || event.key === 'ArrowUp') this.vehicleState.forward = 1;
-            if (event.key === 's' || event.key === 'ArrowDown') this.vehicleState.forward = -1;
-            if (event.key === 'a' || event.key === 'ArrowLeft') this.vehicleState.right = 1;
-            if (event.key === 'd' || event.key === 'ArrowRight') this.vehicleState.right = -1;
+            if (event.key === 'w' ) this.vehicleState.forward = 1;
+            if (event.key === 's' ) this.vehicleState.forward = -1;
+            if (event.key === 'a' ) this.vehicleState.right = 1;
+            if (event.key === 'd' ) this.vehicleState.right = -1;
             if (event.key === 'r') this.vehicleState.reset = true;
             if (event.key === ' ') this.vehicleState.brake = 1;
         });
 
         window.addEventListener('keyup', (event) => {
-            if (event.key === 'w' || event.key === 's' || event.key === 'ArrowUp' || event.key === 'ArrowDown')
+            if (event.key === 'w' || event.key === 's')
                 this.vehicleState.forward = 0;
-            if (event.key === 'a' || event.key === 'd' || event.key === 'ArrowLeft' || event.key === 'ArrowRight')
+            if (event.key === 'a' || event.key === 'd'  )
                 this.vehicleState.right = 0;
             if (event.key === 'r') this.vehicleState.reset = false;
             if (event.key === ' ') this.vehicleState.brake = 0;

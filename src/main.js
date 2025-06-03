@@ -2,22 +2,26 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { Sky } from 'three/addons/objects/Sky.js';
 import * as dat from 'dat.gui';
+import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 
 import { PhysicsSimulator } from './PhysicsSimulator.js';
 import { cityGenerator } from "./cityGenerator.js";
 import {Car} from "./carGenerator.js";
-
-const params = {
-  cameras: 'orbital',
-};
 
 let scene, camera, renderer, container;
 let physicsSimulator;
 let car;
 let sky, sol;
 
-let cameraVehiculo1;
-let cameraVehiculo2;
+let moveForward = false,moveRight = false, moveLeft = false, moveBackward = false;
+let pov = false;
+let velocity = new THREE.Vector3();
+let ang = 0;
+
+const params = {
+  cameras: 'orbital',
+};
+
 const cameraOrbital = new THREE.PerspectiveCamera(
   75,
   window.innerWidth / window.innerHeight,
@@ -26,6 +30,14 @@ const cameraOrbital = new THREE.PerspectiveCamera(
 );
 cameraOrbital.position.set(80, 50, 60);
 cameraOrbital.lookAt(0, 0, 0);
+
+const cameraPov = new THREE.PerspectiveCamera(
+  100,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+cameraPov.position.set(0, 2, 0);
 
 function setupThreeJs() {
   container = document.getElementById("container3D");
@@ -84,6 +96,22 @@ function animate() {
   requestAnimationFrame(animate);
   time += 0.005;
 
+  // Movimiento
+  if (pov) {
+    const speed = 0.1;
+    const direction = new THREE.Vector3();
+
+    camera.getWorldDirection(direction);
+    direction.normalize();
+  
+    if (moveForward) {
+      camera.position.addScaledVector(direction, speed);
+    }
+    if (moveBackward) {
+      camera.position.addScaledVector(direction, -speed);
+    }
+  }
+
   // fisicas
   physicsSimulator.update();
   car.updateVehicleTransforms(physicsSimulator);
@@ -112,29 +140,92 @@ function createUI() {
     switch (value){
       case 'orbital':
         camera = cameraOrbital;
+        pov = false;
         break;
       case 'vehiculo1':
         camera = car.getCam1();
+        pov = false;
         break;
       case 'vehiculo2':
         camera = car.getCam2();
+        pov = false;
         break;
       case 'peaton':
+        pov = true;
+        camera = cameraPov;
         break;
     }
 	});
+
+  var obj = { 'Reset physics':function(){ physicsSimulator.resetVehicle(); }};
+
+  gui.add(obj,'Reset physics');
 }
+
+document.addEventListener( 'keydown', ( event ) => {
+  switch (event.key) {
+    case 'r':
+      physicsSimulator.resetVehicle();
+      break;
+    case 'ArrowUp':
+			moveForward = true;
+			break;
+    case 'ArrowLeft':
+			moveLeft = true;
+			break;
+    case 'ArrowDown':
+			moveBackward = true;
+			break;
+    case 'ArrowRight':
+			moveRight = true;
+			break;
+    case '1':
+      camera = cameraOrbital;
+      pov = false;
+      break;
+    case '2':
+      camera = car.getCam1();
+      pov = false;
+      break;
+    case '3':
+      camera = car.getCam2();
+      pov = false;
+      break;
+    case '4':
+      pov = true;
+      camera = cameraPov;
+      break;
+  } 
+});
+
+document.addEventListener( 'keyup', (event)=> {
+  switch ( event.key ) {
+    case 'ArrowUp':
+			  moveForward = false;
+				break;
+    case 'ArrowLeft':
+				moveLeft = false;
+				break;
+    case 'ArrowDown':
+				moveBackward = false;
+				break;
+    case 'ArrowRight':
+				moveRight = false;
+				break;
+    }
+});
+
+document.addEventListener('mousemove', (event)=> {
+  const sensitivity = 0.002;
+  ang -= event.movementX * sensitivity;
+  if(pov){
+    camera.rotation.set(0, ang, 0);
+  }
+}, false);
 
 setupThreeJs();
 await initPhysics();
 buildScene();
 createUI();
 animate();
-
-
-document.addEventListener('keydown', (event) => {
-  switch (event.key) {
-    case 'r':
-      physicsSimulator.resetVehicle()
-  }
-});
+        
