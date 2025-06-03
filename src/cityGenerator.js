@@ -72,10 +72,11 @@ function createBuilds(x, z, physicsSimulator){
   let geometry = new ParametricGeometry(fn, 100, 100);
 
   const mat = () => {
-    switch (getRandomInt(1,3)){
+    switch (getRandomInt(1,4)){
       case 1: return materials["build1"];
       case 2: return materials["build2"];
       case 3: return materials["build3"];
+      case 4: return materials["build4"];
     }
   }
 

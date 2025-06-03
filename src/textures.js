@@ -57,6 +57,19 @@ const repeatE3 = 3;
   tex.repeat.set(repeatE3, repeatE3);
 });
 
+// Edificio 2
+const colorE4 = textureLoader.load('textures/edificio4/edificio4_Color.jpg');
+const normalE4 = textureLoader.load('textures/edificio4/edificio4_Normal.jpg');
+const roughnessE4 = textureLoader.load('textures/edificio4/edificio4_Roughness.jpg');
+const metalnessE4 = textureLoader.load('textures/edificio4/edificio4_Metalness.jpg');
+const repeatE4 = 2;
+
+[colorE4, normalE4, roughnessE4, metalnessE4].forEach(tex => {
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(repeatE4, repeatE4);
+});
+
 // Light
 const colorL = textureLoader.load('textures/light/light_Color.jpg');
 const normalL = textureLoader.load('textures/light/light_Normal.jpg');
@@ -98,15 +111,19 @@ const ambientOclusionTecho = textureLoader.load('textures/techo/techo_AmbientOcc
 const colorChasis = textureLoader.load('textures/chasis/chasis_Color.jpg');
 const normalChasis = textureLoader.load('textures/chasis/chasis_Normal.jpg');
 
+const wheel =  textureLoader.load('textures/wheel/wheel.png');
+
 export const materials = {
     "ground": new THREE.MeshStandardMaterial  ( {map: colorG, normalMap: normalG , side: THREE.DoubleSide , aoMap:ambientOclusionG , roughnessMap: roughnessG}),
     "build1": new THREE.MeshStandardMaterial  ( {map: colorE1, normalMap: normalE1 , side: THREE.DoubleSide ,  metalness:1, roughness:0.1, envMap:skyTexture1}),
     "build2": new THREE.MeshStandardMaterial  ( {map: colorE2, normalMap: normalE2 ,  side: THREE.DoubleSide ,  metalness:1, roughness:0.1, envMap:skyTexture1}),
     "build3": new THREE.MeshStandardMaterial  ( {map: colorE3 , emissiveMap: emissionE3, side: THREE.DoubleSide , normalMap:normalE3, aoMap: ambientOclusionE3,  metalnessMap: metalnessE3, roughnessMap: roughnessE3, envMap:skyTexture1 }),
+    "build4": new THREE.MeshStandardMaterial  ( {map: colorE2, normalMap: normalE2 ,  side: THREE.DoubleSide ,  metalnessMap:metalnessE4, roughnessMap:roughnessE4}),
     "light": new THREE.MeshStandardMaterial  ( {map: colorL, normalMap: normalL, side: THREE.DoubleSide , metalnessMap: metalnessL, roughnessMap: roughnessL }),
     "sky1": new THREE.MeshBasicMaterial({ map: skyTexture1, side: THREE.BackSide}),
     "road": new THREE.MeshStandardMaterial({map:colorR, normalMap:normalR,side:THREE.DoubleSide, roughnessMap: roughnessR}),
     "tunel": new THREE.MeshStandardMaterial  ( {map: colorT, normalMap:normalT, side: THREE.DoubleSide , emissiveMap: emissionT, aoMap: ambientOclusionT,  metalnessMap: metalnessT, roughnessMap: roughnessT, envMap:skyTexture1 }),
     "techo": new THREE.MeshStandardMaterial({map: colorTecho, normalMap:normalTecho, side: THREE.DoubleSide,roughnessMap:roughnessTecho, aoMap:ambientOclusionTecho }),
     "chasis": new THREE.MeshStandardMaterial({map: colorChasis, normalMap:normalChasis, side: THREE.DoubleSide,  envMap: skyTexture1, roughness:0.1, metalness:1 }),
+    "wheel" : new THREE.MeshStandardMaterial({ map: wheel }),
 }

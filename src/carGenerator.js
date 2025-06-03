@@ -23,7 +23,9 @@ export class Car {
                 }
                 if(child.name == "windows"){
                     child.material = new THREE.MeshPhysicalMaterial({color: 0xffffff, metalness: 0, roughness: 0, transmission: 1.0, thickness: 0.1, transparent: true, opacity: 0.2});
-                      
+                }
+                if(child.name == "wheelBackLeft" || child.name == "wheelBackRight" || child.name == "wheelFrontLeft" || child.name == "wheelFrontRight" ){
+                    child.material = materials["wheel"];
                 }
 
             })
@@ -64,7 +66,7 @@ export class Car {
                 0.1,
                 1000
             );
-            this.cam2 = camera1;
+            this.cam2 = camera2;
             this.chassis.add(this.cam2);
             this.cam2.position.set(0, 4, 4);
 
