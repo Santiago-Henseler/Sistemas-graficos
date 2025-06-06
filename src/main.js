@@ -17,6 +17,7 @@ let moveForward = false,moveRight = false, moveLeft = false, moveBackward = fals
 let pov = false;
 let velocity = new THREE.Vector3();
 let ang = 0;
+let x_pos = 0;
 
 const params = {
   cameras: 'orbital',
@@ -219,7 +220,7 @@ document.addEventListener('mousemove', (event)=> {
   const sensitivity = 0.002;
   ang -= event.movementX * sensitivity;
   if(pov){
-    camera.rotation.set(0, ang, 0);
+    camera.rotation.set(0, ang*2, 0);
   }
 }, false);
 
