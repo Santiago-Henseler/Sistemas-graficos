@@ -62,7 +62,7 @@ export function buildRoad(){
 	ramp2.position.y = pointRamp2.y;
 	ramp2.position.z = pointRamp2.z;
 
-	ramp2.rotation.y += Math.PI/2;
+	ramp2.rotation.y -= Math.PI/2;
 
 	road.add(ramp2);
 	rigidBodys.push(ramp2);
