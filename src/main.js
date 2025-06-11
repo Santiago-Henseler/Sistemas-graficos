@@ -224,9 +224,12 @@ document.addEventListener('mousemove', (event)=> {
   }
 }, false);
 
-setupThreeJs();
-await initPhysics();
-buildScene();
-createUI();
-animate();
+async function main() {
+  setupThreeJs();
+  await initPhysics();
+  buildScene();
+  createUI();
+  animate();
+}
+main();
         
